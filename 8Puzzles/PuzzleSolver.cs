@@ -5,21 +5,39 @@ using System.Windows.Forms;
 
 namespace _8Puzzles
 {
+    /// <summary>
+    /// Керує логікою гри 8-пазлів, включаючи перемішування, перевірку ходів і розв’язність.
+    /// </summary>
     internal class PuzzleSolver
     {
+        /// <summary>
+        /// Об’єкт дошки гри, що містить кнопки та керує станом гри.
+        /// </summary>
         private readonly GameBoard gameBoard;
+
+        /// <summary>
+        /// Масив кнопок, що представляють клітинки дошки гри (1–8 і порожня клітинка).
+        /// </summary>
         private readonly Button[] buttons;
 
-        // Конструктор: Ініціалізує солвер із дошкою гри та копіює масив кнопок
+        /// <summary>
+        /// Ініціалізує солвер із дошкою гри та копіює масив кнопок.
+        /// </summary>
+        /// <param name="gameBoard">Об’єкт дошки гри для взаємодії з інтерфейсом.</param>
         public PuzzleSolver(GameBoard gameBoard)
         {
             this.gameBoard = gameBoard;
+            /// <summary>
+            /// Масив кнопок, отриманий із приватного поля gameBoard через рефлексію.
+            /// </summary>
             var actualButtons = gameBoard.GetType().GetField("buttons", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(gameBoard) as Button[];
             buttons = new Button[actualButtons.Length];
             Array.Copy(actualButtons, buttons, actualButtons.Length);
         }
 
-        // Виконує випадкове перемішування дошки
+        /// <summary>
+        /// Виконує випадкове перемішування дошки шляхом виконання випадкових ходів.
+        /// </summary>
         public void RandomShuffle()
         {
             buttons[0].Text = "1";
@@ -32,15 +50,30 @@ namespace _8Puzzles
             buttons[7].Text = "8";
             buttons[8].Text = "";
 
+            /// <summary>
+            /// Генератор випадкових чисел для вибору ходів і кількості перемішувань.
+            /// </summary>
             Random random = new Random();
+            /// <summary>
+            /// Кількість випадкових ходів для перемішування (від 100 до 199).
+            /// </summary>
             int numberOfShuffles = random.Next(100, 200);
 
             for (int i = 0; i < numberOfShuffles; i++)
             {
+                /// <summary>
+                /// Список кнопок, які можна перемістити на порожню клітинку.
+                /// </summary>
                 List<Button> possibleMoves = GetPossibleMoves();
                 if (possibleMoves.Count > 0)
                 {
+                    /// <summary>
+                    /// Випадковий індекс для вибору кнопки з можливих ходів.
+                    /// </summary>
                     int randomIndex = random.Next(possibleMoves.Count);
+                    /// <summary>
+                    /// Кнопка, яка буде переміщена на порожню клітинку.
+                    /// </summary>
                     Button buttonToMove = possibleMoves[randomIndex];
                     MoveTile(buttonToMove);
                 }
@@ -53,7 +86,9 @@ namespace _8Puzzles
             gameBoard.ClearLabels();
         }
 
-        // Перевіряє, чи розв’язана головоломка, і сповіщає про перемогу
+        /// <summary>
+        /// Перевіряє, чи розв’язана головоломка, і сповіщає про перемогу користувача.
+        /// </summary>
         public void SolutionChecker()
         {
             if (IsSolved())
@@ -64,14 +99,24 @@ namespace _8Puzzles
             }
         }
 
-        // Перевіряє, чи є хід валідним
+        /// <summary>
+        /// Перевіряє, чи є хід валідним для вибраної кнопки.
+        /// </summary>
+        /// <param name="clickedButton">Кнопка, на яку натиснув користувач.</param>
+        /// <returns>Повертає true, якщо хід валідний, інакше false.</returns>
         public bool IsValidMove(Button clickedButton)
         {
+            /// <summary>
+            /// Список кнопок, які можна перемістити на порожню клітинку.
+            /// </summary>
             List<Button> possibleMoves = GetPossibleMoves();
             return possibleMoves.Contains(clickedButton);
         }
 
-        // Виконує хід, переміщаючи плитку на порожнє місце
+        /// <summary>
+        /// Виконує хід, переміщаючи плитку на порожнє місце, якщо хід валідний.
+        /// </summary>
+        /// <param name="clickedButton">Кнопка, що відповідає плитці для переміщення.</param>
         public void MoveTile(Button clickedButton)
         {
             if (clickedButton != null && IsValidMove(clickedButton))
@@ -80,7 +125,10 @@ namespace _8Puzzles
             }
         }
 
-        // Перевіряє, чи дошка в розв’язаному стані
+        /// <summary>
+        /// Перевіряє, чи дошка перебуває в розв’язаному стані.
+        /// </summary>
+        /// <returns>Повертає true, якщо дошка розв’язана, інакше false.</returns>
         public bool IsSolved()
         {
             return buttons[0].Text == "1" && buttons[1].Text == "2" && buttons[2].Text == "3" &&
@@ -88,10 +136,20 @@ namespace _8Puzzles
                    buttons[6].Text == "7" && buttons[7].Text == "8" && buttons[8].Text == "";
         }
 
-        // Перевіряє, чи конфігурація дошки має розв’язок
+        /// <summary>
+        /// Перевіряє, чи конфігурація дошки має розв’язок на основі кількості інверсій.
+        /// </summary>
+        /// <param name="board">Масив рядків, що представляє поточний стан дошки.</param>
+        /// <returns>Повертає true, якщо конфігурація розв’язна, інакше false.</returns>
         public bool IsSolvable(string[] board)
         {
+            /// <summary>
+            /// Лічильник інверсій у послідовності чисел на дошці.
+            /// </summary>
             int inversions = 0;
+            /// <summary>
+            /// Довжина масиву, що представляє дошку (9 елементів).
+            /// </summary>
             int n = board.Length;
 
             for (int i = 0; i < n; i++)
@@ -102,7 +160,13 @@ namespace _8Puzzles
                     {
                         try
                         {
+                            /// <summary>
+                            /// Число, отримане з тексту кнопки за індексом i.
+                            /// </summary>
                             int value1 = int.Parse(board[i]);
+                            /// <summary>
+                            /// Число, отримане з тексту кнопки за індексом j.
+                            /// </summary>
                             int value2 = int.Parse(board[j]);
                             if (value1 > value2)
                             {
@@ -119,7 +183,11 @@ namespace _8Puzzles
             return (inversions % 2 == 0);
         }
 
-        // Переміщує плитку на порожнє місце та оновлює лічильник ходів
+        /// <summary>
+        /// Переміщує плитку на порожнє місце та оновлює лічильник ходів.
+        /// </summary>
+        /// <param name="button1">Кнопка, що відповідає плитці для переміщення.</param>
+        /// <param name="button2">Кнопка, що відповідає порожній клітинці.</param>
         private void EmptySpotChecker(Button button1, Button button2)
         {
             if (button2 != null && button2.Text == "")
@@ -131,15 +199,33 @@ namespace _8Puzzles
             }
         }
 
-        // Повертає список можливих ходів для порожньої клітинки
+        /// <summary>
+        /// Повертає список кнопок, які можна перемістити на порожню клітинку.
+        /// </summary>
+        /// <returns>Список кнопок, що представляють можливі ходи.</returns>
         private List<Button> GetPossibleMoves()
         {
+            /// <summary>
+            /// Список кнопок, які можна перемістити на порожню клітинку.
+            /// </summary>
             List<Button> possibleMoves = new List<Button>();
+            /// <summary>
+            /// Кнопка, що відповідає порожній клітинці.
+            /// </summary>
             Button emptySpot = GetEmptySpot();
             if (emptySpot == null) return possibleMoves;
 
+            /// <summary>
+            /// Індекс порожньої клітинки в масиві кнопок.
+            /// </summary>
             int emptyIndex = Array.IndexOf(buttons, emptySpot);
+            /// <summary>
+            /// Номер рядка порожньої клітинки (0–2).
+            /// </summary>
             int row = emptyIndex / 3;
+            /// <summary>
+            /// Номер стовпця порожньої клітинки (0–2).
+            /// </summary>
             int col = emptyIndex % 3;
 
             if (row > 0)
@@ -154,7 +240,10 @@ namespace _8Puzzles
             return possibleMoves;
         }
 
-        // Повертає кнопку, що відповідає порожній клітинці
+        /// <summary>
+        /// Повертає кнопку, що відповідає порожній клітинці.
+        /// </summary>
+        /// <returns>Кнопка порожньої клітинки або null, якщо такої немає.</returns>
         private Button GetEmptySpot()
         {
             return buttons.FirstOrDefault(b => b.Text == "");
