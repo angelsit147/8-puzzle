@@ -26,7 +26,7 @@ namespace _8Puzzles.Solvers
         /// <summary>
         /// Максимальна межа глибини пошуку для алгоритму IDS.
         /// </summary>
-        private const int MaxDepthLimit = 40;
+        private const int MaxDepthLimit = 31;
 
         /// <summary>
         /// Лічильник загальної кількості ітерацій алгоритму.

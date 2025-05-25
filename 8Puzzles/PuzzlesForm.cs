@@ -337,7 +337,7 @@ namespace _8Puzzles
                 ISolver solver = null;
                 if (selectedMethod == "LDFS")
                 {
-                    solver = new LDFSSolver(50, 500);
+                    solver = new LDFSSolver(31, 500);
                 }
                 else if (selectedMethod == "BFS")
                 {
